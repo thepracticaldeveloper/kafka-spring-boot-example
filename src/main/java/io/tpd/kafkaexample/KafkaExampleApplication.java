@@ -1,7 +1,9 @@
 package io.tpd.kafkaexample;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,6 @@ public class KafkaExampleApplication {
     @Autowired
     private KafkaProperties kafkaProperties;
 
-    // Configuration based on https://www.codenotfound.com/spring-kafka-json-serializer-deserializer-example.html
-
     // Producer configuration
 
     @Bean
@@ -36,18 +36,27 @@ public class KafkaExampleApplication {
         Map<String, Object> props = new HashMap<>(kafkaProperties.buildProducerProperties());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
         return props;
     }
 
     @Bean
-    public ProducerFactory<String, PracticalAdvice> producerFactory() {
+    public ProducerFactory<String, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<String, PracticalAdvice> kafkaTemplate() {
+    public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
+    }
+
+//    @Bean
+//    public KafkaAdmin admin() {
+//        return new KafkaAdmin(kafkaProperties.buildAdminProperties());
+//    }
+
+    @Bean
+    public NewTopic adviceTopic() {
+        return new NewTopic("advice-topic", 3, (short) 1);
     }
 
     // Consumer configuration
@@ -57,16 +66,29 @@ public class KafkaExampleApplication {
         Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "json");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "practical-advice-consumer-group");
 
         return props;
     }
 
     @Bean
-    public ConsumerFactory<String, PracticalAdvice> consumerFactory() {
+    public ConsumerFactory<String, Object> consumerFactory() {
+        final JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>();
+        jsonDeserializer.addTrustedPackages("*");
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                new JsonDeserializer<>(PracticalAdvice.class));
+                jsonDeserializer);
     }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+
+        return factory;
+    }
+
+    // String Consumer Configuration
 
     @Bean
     public ConsumerFactory<String, String> stringConsumerFactory() {
@@ -75,20 +97,27 @@ public class KafkaExampleApplication {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, PracticalAdvice> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, PracticalAdvice> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
-
-        return factory;
-    }
-
-    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerStringContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(stringConsumerFactory());
 
+        return factory;
+    }
+
+    // Byte Array Consumer Configuration
+
+    @Bean
+    public ConsumerFactory<String, byte[]> byteArrayConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
+                new ByteArrayDeserializer());
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerByteArrayContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, byte[]> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(byteArrayConsumerFactory());
         return factory;
     }
 }

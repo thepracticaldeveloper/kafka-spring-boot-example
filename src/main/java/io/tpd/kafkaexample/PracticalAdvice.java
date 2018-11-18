@@ -18,4 +18,12 @@ public class PracticalAdvice {
     public int getImportance() {
         return importance;
     }
+
+    @Override
+    public String toString() {
+        return "PracticalAdvice::toString() {" +
+                "message='" + message + '\'' +
+                ", importance=" + importance +
+                '}';
+    }
 }
