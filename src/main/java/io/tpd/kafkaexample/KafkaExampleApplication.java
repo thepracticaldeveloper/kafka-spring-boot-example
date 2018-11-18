@@ -49,11 +49,6 @@ public class KafkaExampleApplication {
         return new KafkaTemplate<>(producerFactory());
     }
 
-//    @Bean
-//    public KafkaAdmin admin() {
-//        return new KafkaAdmin(kafkaProperties.buildAdminProperties());
-//    }
-
     @Bean
     public NewTopic adviceTopic() {
         return new NewTopic("advice-topic", 3, (short) 1);
