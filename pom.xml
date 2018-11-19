@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>kafka-example</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Kafka and Spring Boot sample app by ThePracticalDeveloper</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -38,11 +38,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>io.projectreactor</groupId>-->
-			<!--<artifactId>reactor-test</artifactId>-->
-			<!--<scope>test</scope>-->
-		<!--</dependency>-->
 	</dependencies>
 
 	<build>

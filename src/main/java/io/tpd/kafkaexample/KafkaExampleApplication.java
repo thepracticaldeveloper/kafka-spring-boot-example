@@ -7,6 +7,7 @@ import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -28,6 +29,9 @@ public class KafkaExampleApplication {
 
     @Autowired
     private KafkaProperties kafkaProperties;
+
+    @Value("${tpd.topic-name}")
+    private String topicName;
 
     // Producer configuration
 
@@ -51,7 +55,7 @@ public class KafkaExampleApplication {
 
     @Bean
     public NewTopic adviceTopic() {
-        return new NewTopic("advice-topic", 3, (short) 1);
+        return new NewTopic(topicName, 3, (short) 1);
     }
 
     // Consumer configuration

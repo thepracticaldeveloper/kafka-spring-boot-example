@@ -3,3 +3,7 @@ spring:
     consumer:
       group-id: foo
       auto-offset-reset: earliest
+
+tpd:
+  topic-name: advice-topic
+  messages-per-request: 10

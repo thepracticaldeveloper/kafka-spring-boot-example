@@ -6,7 +6,8 @@ public class PracticalAdvice {
     private final String message;
     private final int importance;
 
-    public PracticalAdvice(@JsonProperty("message") final String message, @JsonProperty("importance") final int importance) {
+    public PracticalAdvice(@JsonProperty("message") final String message,
+                           @JsonProperty("importance") final int importance) {
         this.message = message;
         this.importance = importance;
     }
