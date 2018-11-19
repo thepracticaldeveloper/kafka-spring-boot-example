@@ -37,9 +37,12 @@ public class KafkaExampleApplication {
 
     @Bean
     public Map<String, Object> producerConfigs() {
-        Map<String, Object> props = new HashMap<>(kafkaProperties.buildProducerProperties());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        Map<String, Object> props =
+                new HashMap<>(kafkaProperties.buildProducerProperties());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JsonSerializer.class);
         return props;
     }
 
@@ -62,10 +65,15 @@ public class KafkaExampleApplication {
 
     @Bean
     public Map<String, Object> consumerConfigs() {
-        Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "practical-advice-consumer-group");
+        Map<String, Object> props = new HashMap<>(
+                kafkaProperties.buildConsumerProperties()
+        );
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                JsonDeserializer.class);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,
+                "practical-advice-consumer-group");
 
         return props;
     }
@@ -74,8 +82,9 @@ public class KafkaExampleApplication {
     public ConsumerFactory<String, Object> consumerFactory() {
         final JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>();
         jsonDeserializer.addTrustedPackages("*");
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                jsonDeserializer);
+        return new DefaultKafkaConsumerFactory<>(
+                consumerConfigs(), new StringDeserializer(), jsonDeserializer
+        );
     }
 
     @Bean
@@ -91,8 +100,9 @@ public class KafkaExampleApplication {
 
     @Bean
     public ConsumerFactory<String, String> stringConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                new StringDeserializer());
+        return new DefaultKafkaConsumerFactory<>(
+                consumerConfigs(), new StringDeserializer(), new StringDeserializer()
+        );
     }
 
     @Bean
@@ -108,8 +118,9 @@ public class KafkaExampleApplication {
 
     @Bean
     public ConsumerFactory<String, byte[]> byteArrayConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                new ByteArrayDeserializer());
+        return new DefaultKafkaConsumerFactory<>(
+                consumerConfigs(), new StringDeserializer(), new ByteArrayDeserializer()
+        );
     }
 
     @Bean

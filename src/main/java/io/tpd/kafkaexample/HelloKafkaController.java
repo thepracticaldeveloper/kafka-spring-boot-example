@@ -18,16 +18,18 @@ import java.util.stream.StreamSupport;
 @RestController
 public class HelloKafkaController {
 
-    private static final Logger logger = LoggerFactory.getLogger(HelloKafkaController.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(HelloKafkaController.class);
 
     private final KafkaTemplate<String, Object> template;
     private final String topicName;
     private final int messagesPerRequest;
     private CountDownLatch latch;
 
-    public HelloKafkaController(final KafkaTemplate<String, Object> template,
-                                @Value("${tpd.topic-name}") final String topicName,
-                                @Value("${tpd.messages-per-request}") final int messagesPerRequest) {
+    public HelloKafkaController(
+            final KafkaTemplate<String, Object> template,
+            @Value("${tpd.topic-name}") final String topicName,
+            @Value("${tpd.messages-per-request}") final int messagesPerRequest) {
         this.template = template;
         this.topicName = topicName;
         this.messagesPerRequest = messagesPerRequest;
