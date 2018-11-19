@@ -23,7 +23,7 @@ public class HelloKafkaController {
     private final KafkaTemplate<String, Object> template;
     private final String topicName;
     private final int messagesPerRequest;
-    private final CountDownLatch latch;
+    private CountDownLatch latch;
 
     public HelloKafkaController(final KafkaTemplate<String, Object> template,
                                 @Value("${tpd.topic-name}") final String topicName,
@@ -31,11 +31,11 @@ public class HelloKafkaController {
         this.template = template;
         this.topicName = topicName;
         this.messagesPerRequest = messagesPerRequest;
-        this.latch = new CountDownLatch(messagesPerRequest);
     }
 
     @GetMapping("/hello")
     public String hello() throws Exception {
+        latch = new CountDownLatch(messagesPerRequest);
         IntStream.range(0, messagesPerRequest)
                 .forEach(i -> this.template.send(topicName, String.valueOf(i),
                         new PracticalAdvice("A Practical Advice", i))
@@ -48,21 +48,24 @@ public class HelloKafkaController {
     @KafkaListener(topics = "advice-topic", clientIdPrefix = "json",
             containerFactory = "kafkaListenerContainerFactory")
     public void listenAsObject(ConsumerRecord<String, PracticalAdvice> cr) {
-        logger.info("Logger [JSON]: Type [{}] | {}", typeIdHeader(cr.headers()), cr.toString());
+        logger.info("Logger 1 [JSON] received key {}: Type [{}] | {}", cr.key(),
+                typeIdHeader(cr.headers()), cr.toString());
         latch.countDown();
     }
 
     @KafkaListener(topics = "advice-topic", clientIdPrefix = "string",
             containerFactory = "kafkaListenerStringContainerFactory")
     public void listenasString(ConsumerRecord<String, String> cr) {
-        logger.info("Logger [String]: Type [{}] | {}", typeIdHeader(cr.headers()), cr.toString());
+        logger.info("Logger 2 [String] received key {}: Type [{}] | {}", cr.key(),
+                typeIdHeader(cr.headers()), cr.toString());
         latch.countDown();
     }
 
     @KafkaListener(topics = "advice-topic", clientIdPrefix = "bytearray",
             containerFactory = "kafkaListenerByteArrayContainerFactory")
     public void listenAsByteArray(ConsumerRecord<String, byte[]> cr) {
-        logger.info("Logger 3 [ByteArray]: Type [{}] | {}", typeIdHeader(cr.headers()), cr.toString());
+        logger.info("Logger 3 [ByteArray] received key {}: Type [{}] | {}", cr.key(),
+                typeIdHeader(cr.headers()), cr.toString());
         latch.countDown();
     }
 
