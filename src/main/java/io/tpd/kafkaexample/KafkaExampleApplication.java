@@ -1,7 +1,6 @@
 package io.tpd.kafkaexample;
 
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -64,26 +63,11 @@ public class KafkaExampleApplication {
     // Consumer configuration
 
     @Bean
-    public Map<String, Object> consumerConfigs() {
-        Map<String, Object> props = new HashMap<>(
-                kafkaProperties.buildConsumerProperties()
-        );
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                JsonDeserializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG,
-                "practical-advice-consumer-group");
-
-        return props;
-    }
-
-    @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
         final JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>();
         jsonDeserializer.addTrustedPackages("*");
         return new DefaultKafkaConsumerFactory<>(
-                consumerConfigs(), new StringDeserializer(), jsonDeserializer
+                kafkaProperties.buildConsumerProperties(), new StringDeserializer(), jsonDeserializer
         );
     }
 
@@ -101,7 +85,7 @@ public class KafkaExampleApplication {
     @Bean
     public ConsumerFactory<String, String> stringConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(
-                consumerConfigs(), new StringDeserializer(), new StringDeserializer()
+                kafkaProperties.buildConsumerProperties(), new StringDeserializer(), new StringDeserializer()
         );
     }
 
@@ -119,7 +103,7 @@ public class KafkaExampleApplication {
     @Bean
     public ConsumerFactory<String, byte[]> byteArrayConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(
-                consumerConfigs(), new StringDeserializer(), new ByteArrayDeserializer()
+                kafkaProperties.buildConsumerProperties(), new StringDeserializer(), new ByteArrayDeserializer()
         );
     }
 
