@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,25 +50,28 @@ public class HelloKafkaController {
 
     @KafkaListener(topics = "advice-topic", clientIdPrefix = "json",
             containerFactory = "kafkaListenerContainerFactory")
-    public void listenAsObject(ConsumerRecord<String, PracticalAdvice> cr) {
-        logger.info("Logger 1 [JSON] received key {}: Type [{}] | {}", cr.key(),
-                typeIdHeader(cr.headers()), cr.toString());
+    public void listenAsObject(ConsumerRecord<String, PracticalAdvice> cr,
+                               @Payload PracticalAdvice payload) {
+        logger.info("Logger 1 [JSON] received key {}: Type [{}] | Payload: {} | Record: {}", cr.key(),
+                typeIdHeader(cr.headers()), payload, cr.toString());
         latch.countDown();
     }
 
     @KafkaListener(topics = "advice-topic", clientIdPrefix = "string",
             containerFactory = "kafkaListenerStringContainerFactory")
-    public void listenasString(ConsumerRecord<String, String> cr) {
-        logger.info("Logger 2 [String] received key {}: Type [{}] | {}", cr.key(),
-                typeIdHeader(cr.headers()), cr.toString());
+    public void listenasString(ConsumerRecord<String, String> cr,
+                               @Payload String payload) {
+        logger.info("Logger 2 [String] received key {}: Type [{}] | Payload: {} | Record: {}", cr.key(),
+                typeIdHeader(cr.headers()), payload, cr.toString());
         latch.countDown();
     }
 
     @KafkaListener(topics = "advice-topic", clientIdPrefix = "bytearray",
             containerFactory = "kafkaListenerByteArrayContainerFactory")
-    public void listenAsByteArray(ConsumerRecord<String, byte[]> cr) {
-        logger.info("Logger 3 [ByteArray] received key {}: Type [{}] | {}", cr.key(),
-                typeIdHeader(cr.headers()), cr.toString());
+    public void listenAsByteArray(ConsumerRecord<String, byte[]> cr,
+                                  @Payload byte[] payload) {
+        logger.info("Logger 3 [ByteArray] received key {}: Type [{}] | Payload: {} | Record: {}", cr.key(),
+                typeIdHeader(cr.headers()), payload, cr.toString());
         latch.countDown();
     }
 
